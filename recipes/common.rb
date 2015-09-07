@@ -30,27 +30,27 @@ else
       mode '755'
       recursive true
     end
+
+  # Define zabbix owned folders
+  zabbix_dirs = [
+    node['zabbix']['log_dir'],
+    node['zabbix']['run_dir']
+  ]
+
+  # Create zabbix folders
+  zabbix_dirs.each do |dir|
+    directory dir do
+      owner node['zabbix']['login']
+      group node['zabbix']['group']
+      mode '755'
+      recursive true
+      # Only execute this if zabbix can't write to it. This handles cases of
+      # dir being world writable (like /tmp)
+      not_if { ::File.world_writable?(dir) }
+    end
   end
 end
 
-# Define zabbix owned folders
-zabbix_dirs = [
-  node['zabbix']['log_dir'],
-  node['zabbix']['run_dir']
-]
-
-# Create zabbix folders
-zabbix_dirs.each do |dir|
-  directory dir do
-    owner node['zabbix']['login']
-    group node['zabbix']['group']
-    mode '755'
-    recursive true
-    # Only execute this if zabbix can't write to it. This handles cases of
-    # dir being world writable (like /tmp)
-    not_if { ::File.world_writable?(dir) }
-  end
-end
 
 unless node['zabbix']['agent']['source_url']
   node.default['zabbix']['agent']['source_url'] = Chef::Zabbix.default_download_url(node['zabbix']['agent']['branch'], node['zabbix']['agent']['version'])
