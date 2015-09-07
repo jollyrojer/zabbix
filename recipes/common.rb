@@ -30,7 +30,7 @@ else
       mode '755'
       recursive true
     end
-
+  end
   # Define zabbix owned folders
   zabbix_dirs = [
     node['zabbix']['log_dir'],
